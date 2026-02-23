@@ -23,31 +23,46 @@ It is a modular AI retrieval engine that demonstrates real-world RAG architectur
 
 ---
 
-## 🧠 Architecture Overview
+## Architecture Overview
 
-VectorForge follows a structured multi-layer pipeline:
-User Query
-↓
-Intent Detection Layer
-↓
-Embedding Model (all-MiniLM-L6-v2)
-↓
-FAISS Vector Search (Cosine Similarity)
-↓
-Top-K Context Retrieval
-↓
-Similarity Guardrail
-↓
-Local LLM (Llama3 via Ollama)
-↓
-Structured Response
+VectorForge follows a modular, layered architecture designed to simulate production-grade Retrieval-Augmented Generation systems.
 
+The system is divided into four primary layers:
 
-The system dynamically adapts retrieval depth based on query intent (fact lookup vs document summarization).
+### 1️. Interface Layer
 
+- Handles user interaction through a Flask-based web application.
+- Manages file uploads, chat state, and session memory.
+
+### 2️. Retrieval Layer
+
+- Responsible for document processing and semantic search.
+- Documents are chunked and embedded using all-MiniLM-L6-v2.
+- Embeddings are normalized and stored in a FAISS index.
+- Cosine similarity is used for approximate nearest neighbor search.
+- Retrieval depth adapts based on query intent (fact-level vs document-level queries).
+
+### 3️. Control & Safety Layer
+
+- Implements guardrails and logic before LLM invocation.
+- Intent detection (summary, explanation, fact lookup)
+- Similarity-based hallucination prevention
+- Dynamic top-K adjustment
+- Empty-index handling
+
+### 4️. Generation Layer
+
+Uses a local LLM (Llama3 via Ollama) to generate grounded responses strictly from retrieved context.
+
+The LLM receives:
+
+- Retrieved document chunks
+- Structured system instructions
+- User query
+- Output formatting constraints
 ---
 
-## 🏗 System Design Principles
+##  System Design Principles
 
 VectorForge is built with:
 
@@ -60,7 +75,7 @@ VectorForge is built with:
 
 ---
 
-## 🛠 Tech Stack
+##  Tech Stack
 
 **Backend**
 - Python
@@ -76,7 +91,7 @@ VectorForge is built with:
 
 ---
 
-## 📊 Performance Characteristics
+##  Performance Characteristics
 
 - Retrieval latency: ~1–5 ms
 - LLM latency: ~2–4 seconds (local inference)
@@ -85,7 +100,7 @@ VectorForge is built with:
 
 ---
 
-## 🧩 Engineering Highlights
+##  Engineering Highlights
 
 - Cosine similarity via normalized embeddings
 - Hybrid retrieval logic
