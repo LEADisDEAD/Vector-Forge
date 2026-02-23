@@ -112,9 +112,67 @@ VectorForge is built with:
 
 ---
 
+## Folder Structure
+
+```
+Vector-Forge/
+│
+├── app.py                    # Flask application entry point
+├── search.py                 # Retrieval pipeline + LLM integration
+├── indexer.py                # FAISS indexing logic
+├── embeddings.py             # Embedding model wrapper
+├── utils.py                  # Utility functions (chunking, helpers)
+│
+├── templates/                # HTML templates
+│   ├── index.html
+│   └── landing.html
+│
+├── static/                   # Frontend assets
+│   └── style.css
+│
+├── uploads/                  # Uploaded documents (runtime storage)
+│
+├── requirements.txt
+├── .gitignore
+└── README.md
+```
 ## 📦 Running Locally
 
-### 1️⃣ Create virtual environment
+### 1️. Create virtual environment
 ```bash
 python -m venv venv
+```
+Activate it(Windows Git Bash):
+
+```bash
 source venv/Scripts/activate
+```
+If using powershell:
+
+```bash
+venv\Scripts\activate
+```
+
+### 2. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Start Ollama (Llama3):
+Make sure Ollama is running and Llama3 is installed:
+```bash
+ollama run llama3
+```
+### 4. Run the Application
+
+```bash
+python app.py
+```
+### 5. Open in Browser
+http://127.0.0.1:5000
+
+
+
+
+
+
