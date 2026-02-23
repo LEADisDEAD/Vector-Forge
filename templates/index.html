@@ -96,7 +96,7 @@
                                 <div class="message-bubble assistant-bubble">
 
                                     <div class="assistant-text">
-                                        {{ msg.content }}
+                                        {{ msg.content | safe }}
                                     </div>
 
                                     <div class="assistant-meta">
@@ -106,14 +106,26 @@
                                         Total: {{ msg.total_time }}s
                                     </div>
 
-                                    <details class="source-details">
-                                        <summary>View Sources</summary>
+                                    {% if msg.sources %}
+                                    <hr class="source-divider">
+
+                                    <div class="sources-section">
+                                        <h4>Sources</h4>
+
                                         {% for src in msg.sources %}
                                             <div class="source-block">
-                                                {{ search_engine.documents[src.chunk_id] }}
+                                                <div class="source-header">
+                                                    <strong>[{{ src.citation_id }}]</strong>
+                                                    <span class="source-name">{{ src.source }}</span>
+                                                </div>
+
+                                                <div class="source-snippet">
+                                                    {{ src.text }}...
+                                                </div>
                                             </div>
                                         {% endfor %}
-                                    </details>
+                                    </div>
+                                    {% endif %}
 
                                 </div>
                             </div>

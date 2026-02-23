@@ -116,8 +116,9 @@ def web_query():
         "similarity": top_similarity,
         "sources": [
             {
-                "chunk_id": r["chunk_id"],
-                "source": r["source"]
+                "text": r["text"][:500],
+                "source": r["source"],
+                "citation_id": r["citation_id"]
             }
             for r in results
         ],

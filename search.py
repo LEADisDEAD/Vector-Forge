@@ -140,7 +140,12 @@ class SemanticSearch:
                 reverse=True
             )
 
-            return top_candidates[:top_k]
+            final_results = top_candidates[:top_k]
+
+            for i, result in enumerate(final_results):
+                result["citation_id"] = i + 1
+
+            return final_results
 
         return hybrid_results[:top_k]
     
@@ -195,33 +200,37 @@ class SemanticSearch:
 
         for r in results:
             if len(context) + len(r["text"]) < max_chars:
-                context += r["text"] + "\n\n"
+                context += f"[{r['citation_id']}] {r['text']}\n\n"
 
         prompt = f"""
 You are a precise and structured AI assistant.
 
-Use ONLY the provided context to answer the question.
+Use ONLY the provided information below to answer the question.
 Do NOT introduce external knowledge.
-If the answer is not found in the context, respond exactly with:
-"Answer not found in documents."
+If the answer is not found, respond exactly with:
+Answer not found in documents.
 
-Follow these formatting rules:
+Formatting rules:
 
 - Write in clear, natural language.
-- Avoid excessive special characters or symbols.
 - Use short paragraphs.
-- If listing points, place each point on a new line.
+- Avoid unnecessary symbols or decorative formatting.
 - Do not repeat the question.
 - Do not mention the word "context".
+- When using information, cite it using only the number in square brackets like [1].
+- Place citation numbers directly at the end of the relevant sentence.
+- Do NOT write words like "Citation" or any explanation about the reference.
 
 If the user asks to:
-- Summarize → Provide a concise summary covering key ideas.
-- Explain → Provide a clear explanation in simple language.
-- List → Provide structured bullet-style points.
-- Compare → Present differences clearly in separate lines.
+- Summarize → Provide a concise summary of key ideas.
+- Explain → Provide a simple and clear explanation.
+- List → Present each point on a new line.
+- Compare → Show differences clearly on separate lines.
 - Define → Provide a short and precise definition.
 
-Context:
+context:
+
+Information:
 {context}
 
 User Question:
@@ -236,6 +245,13 @@ Provide a concise, well-structured answer.
         )
         
         answer = response["message"]["content"]
+        
+        import re
+
+        def highlight_citations(text):
+            return re.sub(r"\[(\d+)\]", r'<span class="citation">[\1]</span>', text)
+
+        answer = highlight_citations(answer)
 
         # 🔹 Store in cache
         self.answer_cache[question] = answer
