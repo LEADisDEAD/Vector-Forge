@@ -307,9 +307,5 @@ Send me a mail on prathmeshbajpai123@gmail.com for further QnA.
 
 ## ⭐ Star the Repo
 
-- Session-based chat history avoids full database complexity.
-
-- Designed to prioritize clarity of architecture over framework complexity.
-
 
 
