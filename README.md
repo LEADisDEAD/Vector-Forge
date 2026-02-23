@@ -41,21 +41,24 @@ The interface is intentionally minimal and dark-themed to maintain focus on retr
 <img width="1918" height="867" alt="image" src="https://github.com/user-attachments/assets/306efda3-12c0-4fd3-bcd1-88caaa234f3a" />
 
 
-This example demonstrates VectorForge’s full Retrieval-Augmented Generation pipeline in action.
+This example demonstrates VectorForge’s full two-stage Retrieval-Augmented Generation pipeline.
 
 The system performs:
 
-- Dense semantic retrieval using FAISS
+- Hybrid retrieval (Dense + BM25)
+- Cross-encoder second-stage reranking
+- Measured ranking stability (MRR evaluation)
+- Inline citation-grounded generation
+- Structured evidence panel (always visible)
 - Similarity-based confidence scoring
-- Latency instrumentation (retrieval, LLM, total)
-- Expandable source transparency via “View Sources”
-- Intent-aware retrieval depth adjustment
-- Structured summarization and explanation
+- Latency instrumentation (retrieval, rerank, LLM, total)
 
-When a user asks a fact-level question, the system retrieves the most relevant chunks.
-When a user asks a document-level query (e.g., summarization or explanation), retrieval depth increases automatically.
+Retrieved document chunks are first ranked for recall.
+They are then reranked using a cross-encoder for precision.
 
-The expanded source panel exposes the exact retrieved context used by the LLM, ensuring transparency and reducing hallucination risk.
+The final answer includes inline citations like [1], directly mapped to the displayed evidence blocks below the response.
+
+This ensures transparency, traceability, and reduced hallucination risk.
 
 
 
@@ -65,14 +68,15 @@ The expanded source panel exposes the exact retrieved context used by the LLM, e
 ## Core Capabilities
 
 - Multi-document upload & dynamic indexing
-- Dense semantic search using Sentence-Transformers
-- FAISS Approximate Nearest Neighbor (ANN) indexing
-- Intent-aware retrieval (fact-level vs document-level queries)
-- Hallucination guardrails via similarity thresholds
-- Context-aware summarization
-- Session-based conversation memory
-- File deletion with full index rebuild
-- Latency instrumentation (retrieval, LLM, total)
+- Hybrid retrieval (Dense embeddings + BM25 sparse search)
+- Cross-encoder reranking (second-stage precision layer)
+- Citation-grounded answer generation
+- Structured always-visible evidence panel
+- Measured retrieval evaluation (Precision@K, MRR)
+- Similarity-based hallucination guardrails
+- Intent-aware retrieval depth
+- Session-safe source handling
+- Latency instrumentation (retrieval, rerank, LLM, total)
 - Clean SaaS-style UI
 
 ---
@@ -90,11 +94,19 @@ The system is divided into four primary layers:
 
 ### 2️. Retrieval Layer
 
-- Responsible for document processing and semantic search.
-- Documents are chunked and embedded using all-MiniLM-L6-v2.
-- Embeddings are normalized and stored in a FAISS index.
-- Cosine similarity is used for approximate nearest neighbor search.
-- Retrieval depth adapts based on query intent (fact-level vs document-level queries).
+Implements a two-stage retrieval pipeline:
+
+Stage 1 — Recall:
+- Dense embeddings using all-MiniLM-L6-v2
+- Sparse lexical retrieval using BM25
+- Weighted hybrid score fusion
+
+Stage 2 — Precision:
+- Cross-encoder reranking using ms-marco-MiniLM-L-6-v2
+- Joint query–chunk relevance scoring
+- Improved rank stability under semantic overlap
+
+This layered retrieval design mirrors production search systems.
 
 ### 3️. Control & Safety Layer
 
@@ -106,15 +118,15 @@ The system is divided into four primary layers:
 
 ### 4️. Generation Layer
 
-Uses a local LLM (Llama3 via Ollama) to generate grounded responses strictly from retrieved context.
+Uses a local LLM (Llama3 via Ollama) to generate grounded responses.
 
 The LLM receives:
+- Numbered retrieved chunks
+- Structured instructions
+- Query intent classification
+- Strict citation formatting rules
 
-- Retrieved document chunks
-- Structured system instructions
-- User query
-- Output formatting constraints
----
+Responses include inline citations like [1], directly mapped to structured evidence blocks displayed below the answer.
 
 ##  System Design Principles
 
@@ -126,6 +138,21 @@ VectorForge is built with:
 - Measurable latency tracking
 - Safe fallback for empty or low-confidence states
 - Fully local inference (no cloud APIs required)
+
+## Retrieval Evaluation
+
+VectorForge includes a retrieval evaluation harness to measure ranking performance under multi-document conditions.
+
+Metrics used:
+- Precision@K
+- Mean Reciprocal Rank (MRR)
+
+Under a 450+ chunk multi-document corpus:
+
+- Hybrid-only retrieval: MRR ≈ 0.87
+- Hybrid + Cross-Encoder reranking: MRR ≈ 0.90
+
+This demonstrates measurable ranking improvement through second-stage precision refinement.
 
 ---
 
