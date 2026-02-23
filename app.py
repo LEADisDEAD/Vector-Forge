@@ -97,7 +97,7 @@ def web_query():
     llm_time = round(llm_end - llm_start, 4)
     total_time = round(total_end - total_start, 4)
 
-    top_similarity = results[0]["similarity_score"] if results else 0
+    top_similarity = results[0]["final_score"] if results else 0
 
     # ---- Hallucination Guardrail ----
     if not (is_summary or is_document_level) and top_similarity < 0.25:
@@ -113,7 +113,7 @@ def web_query():
         "role": "assistant",
         "content": answer,
         "similarity": top_similarity,
-        "sources": results,
+        "sources": [],
         "retrieval_time": retrieval_time,
         "llm_time": llm_time,
         "total_time": total_time

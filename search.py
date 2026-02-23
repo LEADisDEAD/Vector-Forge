@@ -1,5 +1,5 @@
 import ollama
-
+from rank_bm25 import BM25Okapi
 
 
 class SemanticSearch:
@@ -10,12 +10,18 @@ class SemanticSearch:
         self.doc_metadata = []
         self.uploaded_files = {}
         self.answer_cache = {}
+        self.tokenized_docs = []
+        self.bm25 = None
 
     def add_documents(self, documents, source_name=None):
 
         start_index = len(self.documents)
 
         self.documents.extend(documents)
+        
+        # ---- Update BM25 corpus ----
+        self.tokenized_docs = [doc.split() for doc in self.documents]
+        self.bm25 = BM25Okapi(self.tokenized_docs)
 
         embeddings = self.embedding_model.encode(documents)
         self.indexer.add(embeddings)
@@ -35,40 +41,109 @@ class SemanticSearch:
                 
     def query(self, text, top_k=3):
 
-    # 🔹 Step 1: Retrieve more candidates from FAISS
-        candidate_k = top_k * 5
+        # ---- 1️⃣ Dense Retrieval ----
+        dense_candidate_k = top_k * 5
         query_vector = self.embedding_model.encode([text])
-        distances, indices = self.indexer.search(query_vector, candidate_k)
+        distances, indices = self.indexer.search(query_vector, dense_candidate_k)
 
-        results = []
+        dense_results = {}
 
         for rank, idx in enumerate(indices[0]):
             similarity = float(distances[0][rank])
 
-            doc_text = self.documents[idx]
-
-            # 🔹 Better lexical boost (token overlap, not full string match)
-            query_tokens = set(text.lower().split())
-            doc_tokens = set(doc_text.lower().split())
-            overlap = len(query_tokens.intersection(doc_tokens))
-
-            keyword_bonus = 0.02 * overlap  # scaled boost
-
-            final_score = similarity + keyword_bonus
-
-            results.append({
+            dense_results[int(idx)] = {
                 "chunk_id": int(idx),
-                "similarity_score": round(similarity, 4),
+                "dense_score": similarity,
+                "source": self.doc_metadata[idx]["source"],
+                "text": self.documents[idx]
+            }
+
+        # ---- 2️⃣ Sparse Retrieval (BM25) ----
+        sparse_results = {}
+        if self.bm25 is not None:
+            tokenized_query = text.split()
+            scores = self.bm25.get_scores(tokenized_query)
+
+            top_sparse_indices = sorted(
+                range(len(scores)),
+                key=lambda i: scores[i],
+                reverse=True
+            )[:dense_candidate_k]
+
+            for idx in top_sparse_indices:
+                sparse_results[int(idx)] = scores[idx]
+
+        # ---- 3️⃣ Score Normalization ----
+        if dense_results:
+            max_dense = max([v["dense_score"] for v in dense_results.values()])
+        else:
+            max_dense = 1
+
+        if sparse_results:
+            max_sparse = max(sparse_results.values())
+        else:
+            max_sparse = 1
+
+        # ---- 4️⃣ Fusion ----
+        alpha = 0.7  # weight for dense
+        beta = 0.3   # weight for sparse
+
+        hybrid_results = []
+
+        all_indices = set(dense_results.keys()).union(set(sparse_results.keys()))
+
+        for idx in all_indices:
+
+            dense_score = dense_results.get(idx, {}).get("dense_score", 0)
+            sparse_score = sparse_results.get(idx, 0)
+
+            normalized_dense = dense_score / max_dense if max_dense else 0
+            normalized_sparse = sparse_score / max_sparse if max_sparse else 0
+
+            final_score = (alpha * normalized_dense) + (beta * normalized_sparse)
+
+            hybrid_results.append({
+                "chunk_id": idx,
+                "similarity_score": round(dense_score, 4),
                 "final_score": round(final_score, 4),
                 "source": self.doc_metadata[idx]["source"],
-                "text": doc_text
+                "text": self.documents[idx]
             })
 
-        # 🔹 True reranking happens here
-        results = sorted(results, key=lambda x: x["final_score"], reverse=True)
+        # ---- 5️⃣ Final Ranking ----
+        hybrid_results = sorted(
+            hybrid_results,
+            key=lambda x: x["final_score"],
+            reverse=True
+        )
 
-        # 🔹 Return only top_k after reranking
-        return results[:top_k]
+        return hybrid_results[:top_k]
+    
+    def bm25_search(self, text, top_k=3):
+        if self.bm25 is None:
+            return []
+
+        tokenized_query = text.split()
+        scores = self.bm25.get_scores(tokenized_query)
+
+        ranked_indices = sorted(
+            range(len(scores)),
+            key=lambda i: scores[i],
+            reverse=True
+        )[:top_k]
+
+        results = []
+
+        for idx in ranked_indices:
+            results.append({
+                "chunk_id": int(idx),
+                "similarity_score": round(float(scores[idx]), 4),
+                "final_score": round(float(scores[idx]), 4),
+                "source": self.doc_metadata[idx]["source"],
+                "text": self.documents[idx]
+            })
+
+        return results
     
     def query_with_context(self, text, top_k=3):
         query_vector = self.embedding_model.encode([text])
