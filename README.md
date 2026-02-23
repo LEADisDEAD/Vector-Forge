@@ -313,6 +313,13 @@ Send me a mail on prathmeshbajpai123@gmail.com for further QnA.
 
 ---
 
+### v2.5 – Citation-Grounded Generation + Structured Evidence Panel
+
+- Inline citation formatting
+- Structured always-visible sources section
+- Session-safe snippet storage
+- Improved UI hierarchy for research-style interaction
+
 ### v2.0 – Cross-Encoder Reranking
 
 - Added second-stage reranking using ms-marco-MiniLM cross-encoder
