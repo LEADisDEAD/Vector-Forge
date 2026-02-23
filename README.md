@@ -313,6 +313,13 @@ Send me a mail on prathmeshbajpai123@gmail.com for further QnA.
 
 ---
 
+### v2.0 – Cross-Encoder Reranking
+
+- Added second-stage reranking using ms-marco-MiniLM cross-encoder
+- Improved precision of top-k context selection
+- Two-stage retrieval pipeline (Recall + Precision)
+- Cleaner source ranking
+
 ### v1.5 – Hybrid Retrieval Upgrade
 
 - Added BM25 sparse retrieval
