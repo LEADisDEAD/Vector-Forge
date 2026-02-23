@@ -1,6 +1,7 @@
 import ollama
 from rank_bm25 import BM25Okapi
 from sentence_transformers import CrossEncoder
+from config import LLM_MODE, API_KEY, API_MODEL
 
 
 class SemanticSearch:
@@ -239,12 +240,34 @@ User Question:
 Provide a concise, well-structured answer.
 """
 
-        response = ollama.chat(
-            model="llama3",
-            messages=[{"role": "user", "content": prompt}]
-        )
-        
-        answer = response["message"]["content"]
+        if LLM_MODE == "local":
+
+            response = ollama.chat(
+                model="llama3",
+                messages=[
+                    {"role": "user", "content": prompt}
+                ],
+                options={"temperature": 0}
+            )
+
+            answer = response["message"]["content"]
+           
+
+        elif LLM_MODE == "api":
+            
+            from groq import Groq
+
+            client = Groq(api_key=API_KEY)
+
+            response = client.chat.completions.create(
+                model=API_MODEL,
+                messages=[
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0
+            )
+
+            answer = response.choices[0].message.content
         
         import re
 
