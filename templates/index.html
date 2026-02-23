@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VectorForge</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="app">
+
+    <!-- ================= TOP BAR ================= -->
+    <div class="topbar">
+        VectorForge
+    </div>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <div class="content">
+
+        <!-- ================= SIDEBAR ================= -->
+        <aside class="sidebar">
+
+            <div class="sidebar-top">
+
+                <div class="sidebar-section">
+                    <h3>Upload Document</h3>
+
+                    <form method="POST" action="/upload" enctype="multipart/form-data" class="upload-form">
+
+                        <label class="file-upload-box">
+                            <input type="file" name="file" id="fileInput" hidden required>
+                            <span id="fileLabel">Click to select a file</span>
+                        </label>
+
+                        <div id="fileName" class="file-name"></div>
+
+                        <button type="submit" class="send-button">
+                            Upload
+                        </button>
+
+                    </form>
+                </div>
+
+                <hr>
+
+                <div class="sidebar-section">
+                    <h3>Uploads</h3>
+
+                    {% if uploaded_files %}
+                        {% for file, count in uploaded_files.items() %}
+                            <div class="file-item">
+                                <span>{{ file }} ({{ count }} chunks)</span>
+
+                                <form method="POST" action="/delete_file">
+                                    <input type="hidden" name="filename" value="{{ file }}">
+                                    <button type="submit" class="delete-btn">✕</button>
+                                </form>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>No files uploaded</p>
+                    {% endif %}
+                </div>
+
+            </div>
+
+            <div class="sidebar-bottom">
+                <form method="POST" action="/clear_chat">
+                    <button type="submit" class="clear-button">
+                        Clear Conversation
+                    </button>
+                </form>
+            </div>
+
+        </aside>
+
+
+        <!-- ================= CHAT PANEL ================= -->
+        <main class="chat-panel">
+
+            <!-- Scrollable Message Area -->
+            <div class="chat-messages" id="chatMessages">
+
+                {% if chat_history and chat_history|length > 0 %}
+
+                    {% for msg in chat_history %}
+
+                        {% if msg.role == "user" %}
+                            <div class="message-row user-row">
+                                <div class="message-bubble user-bubble">
+                                    {{ msg.content }}
+                                </div>
+                            </div>
+
+                        {% else %}
+                            <div class="message-row assistant-row">
+                                <div class="message-bubble assistant-bubble">
+
+                                    <div class="assistant-text">
+                                        {{ msg.content }}
+                                    </div>
+
+                                    <div class="assistant-meta">
+                                        Confidence: {{ (msg.similarity * 100)|round(2) }}% |
+                                        Retrieval: {{ msg.retrieval_time }}s |
+                                        LLM: {{ msg.llm_time }}s |
+                                        Total: {{ msg.total_time }}s
+                                    </div>
+
+                                    <details class="source-details">
+                                        <summary>View Sources</summary>
+                                        {% for src in msg.sources %}
+                                            <div class="source-block">
+                                                {{ src.text }}
+                                            </div>
+                                        {% endfor %}
+                                    </details>
+
+                                </div>
+                            </div>
+
+                        {% endif %}
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="empty-state">
+                        <h2>Start a Conversation</h2>
+                        <p>Upload a document and ask anything about it.</p>
+
+                        <div class="suggestions">
+                            <div class="suggestion" data-text="Summarize the document">
+                                Summarize the document
+                            </div>
+
+                            <div class="suggestion" data-text="What are the key concepts?">
+                                What are the key concepts?
+                            </div>
+
+                            <div class="suggestion" data-text="Explain this in simple terms">
+                                Explain this in simple terms
+                            </div>
+                        </div>
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- Fixed Input Area -->
+            <div class="chat-input-container">
+                <form method="POST" action="/web_query" class="chat-form">
+                    <input 
+                        type="text" 
+                        name="question" 
+                        class="chat-input"
+                        placeholder="Ask something about your documents..."
+                        required
+                    >
+                    <button type="submit" class="send-button">
+                        Send
+                    </button>
+                </form>
+            </div>
+
+        </main>
+
+    </div>
+
+</div>
+
+<!-- Auto Scroll Script -->
+<script>
+    const chat = document.getElementById("chatMessages");
+    if (chat) {
+        chat.scrollTop = chat.scrollHeight;
+    }
+</script>
+
+</body>
+</html>
+
+<script>
+    // Suggestion click autofill
+    const suggestions = document.querySelectorAll(".suggestion");
+    const input = document.querySelector(".chat-input");
+
+    suggestions.forEach(suggestion => {
+        suggestion.addEventListener("click", () => {
+            const text = suggestion.getAttribute("data-text");
+            input.value = text;
+            input.focus();
+        });
+    });
+</script>
+
+<script>
+const fileInput = document.getElementById("fileInput");
+const fileName = document.getElementById("fileName");
+
+if (fileInput) {
+    fileInput.addEventListener("change", function () {
+        if (fileInput.files.length > 0) {
+            fileName.textContent = "Selected: " + fileInput.files[0].name;
+        } else {
+            fileName.textContent = "";
+        }
+    });
+}
+</script>

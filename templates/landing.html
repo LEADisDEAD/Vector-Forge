@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VectorForge</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="landing-wrapper">
+
+    <!-- ================= MAIN CENTERED CONTENT ================= -->
+    <div class="landing-content">
+
+        <!-- BADGE + TITLE -->
+        <div class="title-section">
+
+            <h1 class="main-title gradient-text">
+                VectorForge
+            </h1>
+
+            <p class="main-description">
+                A production-style Retrieval-Augmented Generation system built with
+                FAISS, hybrid reranking, and a fully local LLM pipeline.
+            </p>
+
+        </div>
+
+        <!-- FEATURE CARDS -->
+        <div class="features-row">
+
+            <div class="feature-cube">
+                <h3>Semantic Search</h3>
+                <p>Dense vector retrieval with FAISS indexing.</p>
+            </div>
+
+            <div class="feature-cube">
+                <h3>Hybrid Ranking</h3>
+                <p>Two-stage retrieval with lexical + semantic boost.</p>
+            </div>
+
+            <div class="feature-cube">
+                <h3>Local LLM</h3>
+                <p>Llama3 powered contextual answer generation.</p>
+            </div>
+
+            <div class="feature-cube">
+                <h3>Performance Metrics</h3>
+                <p>Retrieval, LLM latency, and confidence scoring.</p>
+            </div>
+
+        </div>
+
+        <!-- CTA BUTTONS -->
+        <div class="cta-section">
+            <button onclick="window.location.href='/app'" class="primary-btn">
+                Open App
+            </button>
+
+            <a href="#" class="secondary-btn">
+                GitHub
+            </a>
+        </div>
+
+    </div>
+    <!-- ================= END CENTER CONTENT ================= -->
+
+
+    <!-- ================= FOOTER (STAYS AT BOTTOM) ================= -->
+    <div class="footer">
+        Built by Prathmesh Bajpai • 2026
+    </div>
+
+</div>
+
+</body>
+</html>
