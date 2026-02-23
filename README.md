@@ -8,7 +8,7 @@ It is a modular AI retrieval engine that demonstrates real-world RAG architectur
 
 ---
 
-## 🚀 Core Capabilities
+## Core Capabilities
 
 - Multi-document upload & dynamic indexing
 - Dense semantic search using Sentence-Transformers
@@ -26,3 +26,80 @@ It is a modular AI retrieval engine that demonstrates real-world RAG architectur
 ## 🧠 Architecture Overview
 
 VectorForge follows a structured multi-layer pipeline:
+User Query
+↓
+Intent Detection Layer
+↓
+Embedding Model (all-MiniLM-L6-v2)
+↓
+FAISS Vector Search (Cosine Similarity)
+↓
+Top-K Context Retrieval
+↓
+Similarity Guardrail
+↓
+Local LLM (Llama3 via Ollama)
+↓
+Structured Response
+
+
+The system dynamically adapts retrieval depth based on query intent (fact lookup vs document summarization).
+
+---
+
+## 🏗 System Design Principles
+
+VectorForge is built with:
+
+- Separation of concerns (embeddings, indexing, retrieval, API)
+- Modular architecture
+- Explainable retrieval outputs
+- Measurable latency tracking
+- Safe fallback for empty or low-confidence states
+- Fully local inference (no cloud APIs required)
+
+---
+
+## 🛠 Tech Stack
+
+**Backend**
+- Python
+- Flask
+- FAISS (ANN search)
+- Sentence-Transformers
+- Ollama (Llama3 local inference)
+
+**Frontend**
+- HTML
+- Custom CSS (minimal SaaS design)
+- Lightweight JavaScript
+
+---
+
+## 📊 Performance Characteristics
+
+- Retrieval latency: ~1–5 ms
+- LLM latency: ~2–4 seconds (local inference)
+- Zero external API dependency
+- Dynamic indexing without server restart
+
+---
+
+## 🧩 Engineering Highlights
+
+- Cosine similarity via normalized embeddings
+- Hybrid retrieval logic
+- Similarity-based hallucination guardrails
+- Session-managed conversation state
+- Dynamic FAISS index rebuild on file deletion
+- Persistent upload handling
+- Clean Git-based version control
+
+---
+
+## 📦 Running Locally
+
+### 1️⃣ Create virtual environment
+```bash
+python -m venv venv
+source venv/Scripts/activate
