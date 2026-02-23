@@ -8,6 +8,60 @@ It is a modular AI retrieval engine that demonstrates real-world RAG architectur
 
 ---
 
+## Application Preview
+
+### 1. Landing Page
+<img width="1919" height="865" alt="Screenshot 2026-02-23 140152" src="https://github.com/user-attachments/assets/e1637aa2-5245-4126-af99-3bfaa5d43f27" />
+
+The landing page introduces VectorForge as a production-style Retrieval-Augmented Generation system.
+It highlights:
+
+- Semantic search capabilities
+- Hybrid retrieval architecture
+- Local LLM integration
+- Performance instrumentation
+
+This screen communicates the system’s purpose, architectural maturity, and production positioning before users enter the application.
+
+### 2. Home Interface - Document Workspace
+
+<img width="1919" height="863" alt="Screenshot 2026-02-23 140819" src="https://github.com/user-attachments/assets/8072227c-09c8-4558-b4b4-af1d6e37e53e" />
+
+The primary workspace enables:
+
+- Document upload and dynamic indexing
+- Chunk tracking per file
+- Conversation management
+- Structured query interaction
+
+The interface is intentionally minimal and dark-themed to maintain focus on retrieval and response generation.
+
+### 3. Semantic Retrieval with Explainability
+
+<img width="1918" height="870" alt="image" src="https://github.com/user-attachments/assets/58b20224-4af0-4fe6-8bf4-17f99d028d51" />
+<img width="1516" height="816" alt="image" src="https://github.com/user-attachments/assets/e0911d58-371a-4128-906f-0dd6a54aa8fc" />
+
+This example demonstrates VectorForge’s full Retrieval-Augmented Generation pipeline in action.
+
+The system performs:
+
+- Dense semantic retrieval using FAISS
+- Similarity-based confidence scoring
+- Latency instrumentation (retrieval, LLM, total)
+- Expandable source transparency via “View Sources”
+- Intent-aware retrieval depth adjustment
+- Structured summarization and explanation
+
+When a user asks a fact-level question, the system retrieves the most relevant chunks.
+When a user asks a document-level query (e.g., summarization or explanation), retrieval depth increases automatically.
+
+The expanded source panel exposes the exact retrieved context used by the LLM, ensuring transparency and reducing hallucination risk.
+
+
+
+
+
+
 ## Core Capabilities
 
 - Multi-document upload & dynamic indexing
