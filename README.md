@@ -38,8 +38,8 @@ The interface is intentionally minimal and dark-themed to maintain focus on retr
 
 ### 3. Semantic Retrieval with Explainability
 
-<img width="1918" height="870" alt="image" src="https://github.com/user-attachments/assets/58b20224-4af0-4fe6-8bf4-17f99d028d51" />
-<img width="1516" height="816" alt="image" src="https://github.com/user-attachments/assets/e0911d58-371a-4128-906f-0dd6a54aa8fc" />
+<img width="1918" height="867" alt="image" src="https://github.com/user-attachments/assets/306efda3-12c0-4fd3-bcd1-88caaa234f3a" />
+
 
 This example demonstrates VectorForge’s full Retrieval-Augmented Generation pipeline in action.
 
