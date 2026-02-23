@@ -307,5 +307,26 @@ Send me a mail on prathmeshbajpai123@gmail.com for further QnA.
 
 ## ⭐ Star the Repo
 
+---
+ 
+## 📦 Version History
+
+---
+
+### v1.5 – Hybrid Retrieval Upgrade
+
+- Added BM25 sparse retrieval
+- Implemented weighted score fusion (alpha=0.7, beta=0.3)
+- Normalized hybrid scoring
+- Improved hallucination guardrail alignment
+- Fixed Flask session cookie overflow issue
+
+### v1.0 – Initial RAG System
+
+- Dense semantic search using SentenceTransformers + FAISS
+- Local LLM integration (Ollama + Llama3)
+- Intent-aware retrieval
+- Retrieval & latency metrics
+- Clean SaaS-style UI
 
 
