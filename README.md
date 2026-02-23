@@ -136,7 +136,7 @@ Vector-Forge/
 ├── .gitignore
 └── README.md
 ```
-## 📦 Running Locally
+##  Running Locally
 
 ### 1️. Create virtual environment
 ```bash
@@ -169,10 +169,16 @@ ollama run llama3
 python app.py
 ```
 ### 5. Open in Browser
-http://127.0.0.1:5000
 
-## Example Use cases
+http://127.0.0.1:5000
+ 
+---
+## Example Use cases:
+
+
 ### 1. Academic Research Assistant
+
+
 Upload Research Papers (PDF/TXT) and:
 - Ask concept-level questions
 - Generate document summaries
@@ -181,8 +187,75 @@ Upload Research Papers (PDF/TXT) and:
 
 Ideal for students, researchers, and thesis work.
 
+### 2. Internal Knowledge Base Search
 
+Use VectorForge as a lightweight internal documentation engine:
 
+- Upload technical docs
+- Query system architecture
+- Retrieve configuration details
+- Summarize large documentation sets
+
+Works well for startups or small teams without full enterprise search tooling.
+
+### 3️. Technical Document Summarization
+
+Instead of reading long whitepapers or reports:
+
+- Generate structured summaries
+- Extract key points
+- Identify main contributions
+- Quickly understand scope and limitations
+
+### 4️. AI Safety Demonstration
+
+Demonstrates:
+
+- Context-grounded generation
+- Similarity-based hallucination control
+- Controlled retrieval depth
+- Local-only inference pipeline
+
+Useful for showcasing safe AI system design.
+
+### 5️. RAG System Prototyping
+
+VectorForge can serve as:
+
+- A base RAG template
+- A research prototype
+- A starting point for hybrid retrieval systems
+- A deployable foundation for production tools
+---
+## Notes & Design Decisions
+
+- The system is intentionally fully local (no external APIs).
+
+- Retrieval depth adapts based on query intent.
+
+- Hallucination guardrails prevent low-confidence generation.
+
+- Dynamic FAISS index rebuild ensures consistency after file deletion.
+
+## Contributing
+
+Contributions are welcome! Fork this repo, improve it, and submit a PR.
+Suggestions for new models, UI improvements, or metric visualizations are highly encouraged.
+Send me a mail on prathmeshbajpai123@gmail.com for further QnA.
+
+---
+
+## Author - Prathmesh Manoj Bajpai
+
+[LinkedIn](https://www.linkedin.com/in/prathmesh-bajpai-8429652aa/)
+
+---
+
+## ⭐ Star the Repo
+
+- Session-based chat history avoids full database complexity.
+
+- Designed to prioritize clarity of architecture over framework complexity.
 
 
 
