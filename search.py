@@ -14,7 +14,11 @@ class SemanticSearch:
         self.answer_cache = {}
         self.tokenized_docs = []
         self.bm25 = None
-        self.reranker = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
+        
+        if LLM_MODE == "local":
+            self.reranker = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
+        else:
+            self.reranker = None
 
     def add_documents(self, documents, source_name=None):
 
@@ -121,6 +125,18 @@ class SemanticSearch:
         )
 
         # ---- 6️⃣ Cross-Encoder Reranking ----
+
+        # If in production mode (API), skip reranking to reduce memory usage
+        if LLM_MODE == "api":
+            final_results = hybrid_results[:top_k]
+
+            for i, result in enumerate(final_results):
+                result["citation_id"] = i + 1
+
+            return final_results
+
+
+        # Otherwise (local mode), apply reranking
         rerank_k = min(10, len(hybrid_results))
         top_candidates = hybrid_results[:rerank_k]
 
@@ -148,6 +164,7 @@ class SemanticSearch:
 
             return final_results
 
+        # Fallback
         return hybrid_results[:top_k]
     
     def bm25_search(self, text, top_k=3):
