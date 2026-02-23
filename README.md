@@ -171,6 +171,16 @@ python app.py
 ### 5. Open in Browser
 http://127.0.0.1:5000
 
+## Example Use cases
+### 1. Academic Research Assistant
+Upload Research Papers (PDF/TXT) and:
+- Ask concept-level questions
+- Generate document summaries
+- Extract methodology or findings
+- Compare sections across multiple papers
+
+Ideal for students, researchers, and thesis work.
+
 
 
 
