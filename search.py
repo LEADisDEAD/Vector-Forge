@@ -1,5 +1,6 @@
 import ollama
 from rank_bm25 import BM25Okapi
+from sentence_transformers import CrossEncoder
 
 
 class SemanticSearch:
@@ -12,6 +13,7 @@ class SemanticSearch:
         self.answer_cache = {}
         self.tokenized_docs = []
         self.bm25 = None
+        self.reranker = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
 
     def add_documents(self, documents, source_name=None):
 
@@ -110,12 +112,35 @@ class SemanticSearch:
                 "text": self.documents[idx]
             })
 
-        # ---- 5️⃣ Final Ranking ----
+        # ---- 5️⃣ First-stage Ranking (Hybrid) ----
         hybrid_results = sorted(
             hybrid_results,
             key=lambda x: x["final_score"],
             reverse=True
         )
+
+        # ---- 6️⃣ Cross-Encoder Reranking ----
+        rerank_k = min(10, len(hybrid_results))
+        top_candidates = hybrid_results[:rerank_k]
+
+        if top_candidates:
+            query_chunk_pairs = [
+                (text, candidate["text"])
+                for candidate in top_candidates
+            ]
+
+            rerank_scores = self.reranker.predict(query_chunk_pairs)
+
+            for i, score in enumerate(rerank_scores):
+                top_candidates[i]["rerank_score"] = float(score)
+
+            top_candidates = sorted(
+                top_candidates,
+                key=lambda x: x["rerank_score"],
+                reverse=True
+            )
+
+            return top_candidates[:top_k]
 
         return hybrid_results[:top_k]
     

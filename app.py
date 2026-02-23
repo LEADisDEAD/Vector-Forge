@@ -25,7 +25,8 @@ def home():
         chat_history=session.get("chat_history", []),
         uploaded_files=search_engine.uploaded_files,
         total_chunks=len(search_engine.documents),
-        total_files=len(search_engine.uploaded_files)
+        total_files=len(search_engine.uploaded_files),
+        search_engine=search_engine
     )
 
 @app.route("/web_query", methods=["POST"])
@@ -113,7 +114,13 @@ def web_query():
         "role": "assistant",
         "content": answer,
         "similarity": top_similarity,
-        "sources": [],
+        "sources": [
+            {
+                "chunk_id": r["chunk_id"],
+                "source": r["source"]
+            }
+            for r in results
+        ],
         "retrieval_time": retrieval_time,
         "llm_time": llm_time,
         "total_time": total_time

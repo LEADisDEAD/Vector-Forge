@@ -110,7 +110,7 @@
                                         <summary>View Sources</summary>
                                         {% for src in msg.sources %}
                                             <div class="source-block">
-                                                {{ src.text }}
+                                                {{ search_engine.documents[src.chunk_id] }}
                                             </div>
                                         {% endfor %}
                                     </details>
