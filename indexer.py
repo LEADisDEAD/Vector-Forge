@@ -16,7 +16,7 @@ class FaissIndexer:
         )
 
     def add(self, vectors):
-        # IMPORTANT: IVF requires training before adding
+        # IMPORTANTT: IVF needs to be trained before adding
         if not self.index.is_trained:
             self.index.train(vectors)
 

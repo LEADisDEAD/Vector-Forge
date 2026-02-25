@@ -26,7 +26,7 @@ class SemanticSearch:
 
         self.documents.extend(documents)
         
-        # ---- Update BM25 corpus ----
+        # Update BM25
         self.tokenized_docs = [doc.split() for doc in self.documents]
         self.bm25 = BM25Okapi(self.tokenized_docs)
 
@@ -39,7 +39,7 @@ class SemanticSearch:
                 "chunk_index": start_index + i
             })
 
-        # 🔥 This part is important
+      
         if source_name:
             if source_name in self.uploaded_files:
                 self.uploaded_files[source_name] += len(documents)
@@ -48,7 +48,7 @@ class SemanticSearch:
                 
     def query(self, text, top_k=3):
 
-        # ---- 1️⃣ Dense Retrieval ----
+        # Dense Retrieval
         dense_candidate_k = top_k * 5
         query_vector = self.embedding_model.encode([text])
         distances, indices = self.indexer.search(query_vector, dense_candidate_k)
@@ -65,7 +65,7 @@ class SemanticSearch:
                 "text": self.documents[idx]
             }
 
-        # ---- 2️⃣ Sparse Retrieval (BM25) ----
+        # Sparse Retrieval--- BM25
         sparse_results = {}
         if self.bm25 is not None:
             tokenized_query = text.split()
@@ -80,7 +80,7 @@ class SemanticSearch:
             for idx in top_sparse_indices:
                 sparse_results[int(idx)] = scores[idx]
 
-        # ---- 3️⃣ Score Normalization ----
+        # Score Normalization 
         if dense_results:
             max_dense = max([v["dense_score"] for v in dense_results.values()])
         else:
@@ -91,7 +91,7 @@ class SemanticSearch:
         else:
             max_sparse = 1
 
-        # ---- 4️⃣ Fusion ----
+        # Fusion 
         alpha = 0.7  # weight for dense
         beta = 0.3   # weight for sparse
 
@@ -117,16 +117,18 @@ class SemanticSearch:
                 "text": self.documents[idx]
             })
 
-        # ---- 5️⃣ First-stage Ranking (Hybrid) ----
+        # First stage Ranking (Hybrid) 
         hybrid_results = sorted(
             hybrid_results,
             key=lambda x: x["final_score"],
             reverse=True
         )
 
-        # ---- 6️⃣ Cross-Encoder Reranking ----
+        #Cross-Encoder Reranking
+        
 
-        # If in production mode (API), skip reranking to reduce memory usage
+        # If in production mode - API, skip reranking to reduce memory usage
+        # Update: project cannot be deployed due to architectural limits and limited RAM 
         if LLM_MODE == "api":
             final_results = hybrid_results[:top_k]
 
@@ -136,7 +138,7 @@ class SemanticSearch:
             return final_results
 
 
-        # Otherwise (local mode), apply reranking
+        # (local mode), apply reranking
         rerank_k = min(10, len(hybrid_results))
         top_candidates = hybrid_results[:rerank_k]
 
@@ -211,7 +213,7 @@ class SemanticSearch:
         if question in self.answer_cache:
             return self.answer_cache[question]
         
-        # Context Size control - also Token awareness
+        # Context Size control --->also Token awareness
         
         max_chars = 2000
         context = ""
@@ -293,7 +295,7 @@ Provide a concise, well-structured answer.
 
         answer = highlight_citations(answer)
 
-        # 🔹 Store in cache
+        #finally stored in cache
         self.answer_cache[question] = answer
 
         return answer

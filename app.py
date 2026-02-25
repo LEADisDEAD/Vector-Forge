@@ -8,9 +8,8 @@ import time
 import os
 
 
-# -------------------------------
-# Initialize Flask App
-# -------------------------------
+# Flask Initialization
+
 app = Flask(__name__)
 app.secret_key = "vectorforge_secret_key"
 
@@ -39,7 +38,7 @@ def web_query():
 
     q = question.lower()
 
-    # ---- Intent Detection ----
+    # Detection of INtent
     summary_keywords = ["summarize", "summary", "overview", "brief"]
     is_summary = any(word in q for word in summary_keywords)
 
@@ -50,11 +49,11 @@ def web_query():
         ("about" in q and "document" in q)
     )
 
-    # ---- Chat Session Init ----
+    # --Chat Session Init
     if "chat_history" not in session:
         session["chat_history"] = []
 
-    # 🚫 No Documents Guard
+    # No Documents Guard
     if not search_engine.documents:
         session["chat_history"].append({
             "role": "user",
@@ -76,7 +75,7 @@ def web_query():
 
     total_start = time.perf_counter()
 
-    # ---- 1️⃣ Retrieval ----
+    # Retrieval
     retrieval_start = time.perf_counter()
 
     if is_summary or is_document_level:
@@ -86,25 +85,25 @@ def web_query():
 
     retrieval_end = time.perf_counter()
 
-    # ---- 2️⃣ LLM ----
+    # LLM
     llm_start = time.perf_counter()
     answer = search_engine.generate_answer_with_llm(question, results)
     llm_end = time.perf_counter()
 
     total_end = time.perf_counter()
 
-    # ---- Metrics ----
+    # LLM metrics
     retrieval_time = round(retrieval_end - retrieval_start, 4)
     llm_time = round(llm_end - llm_start, 4)
     total_time = round(total_end - total_start, 4)
 
     top_similarity = results[0]["final_score"] if results else 0
 
-    # ---- Hallucination Guardrail ----
+    # Hallucination guardrail (<0.25)
     if not (is_summary or is_document_level) and top_similarity < 0.25:
         answer = "Answer not found in documents."
 
-    # ---- Save Conversation ----
+    # Saving Convos
     session["chat_history"].append({
         "role": "user",
         "content": question
@@ -131,16 +130,14 @@ def web_query():
 
     return redirect(url_for("home"))
 
-# -------------------------------
-# Build Empty Search Engine at Startup
-# -------------------------------
+# Initialization of empty seach engine at startup
 
 print("Initializing empty search engine...")
 
 embedding_model = EmbeddingModel()
 dimension = embedding_model.dimension
 
-# Start with empty index
+# Starting with empty index
 nlist = 1
 indexer = FaissIndexer(dimension, nlist=nlist)
 
@@ -148,16 +145,15 @@ search_engine = SemanticSearch(embedding_model, indexer)
 
 print("System ready. No documents indexed.")
 
-# -------------------------------
-# Health Check Endpoint
-# -------------------------------
+# Session Health
+
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify({"status": "running"})
 
-# -------------------------------
+ 
 # Query Endpoint
-# -------------------------------
+
 @app.route("/query", methods=["POST"])
 def query():
     data = request.get_json()
@@ -199,7 +195,7 @@ def upload():
 
     print(search_engine.uploaded_files)
     
-    # Determine file type
+    # File types
     if file.filename.endswith(".txt"):
         text = load_text_file(filepath)
     elif file.filename.endswith(".pdf"):
@@ -209,7 +205,7 @@ def upload():
 
     chunks = chunk_text(text, chunk_size=80, overlap=20)
 
-    # Add to index dynamically
+    # Adds to the index dynamically
     search_engine.add_documents(chunks, source_name=file.filename)
     
     # clearing cache
@@ -230,7 +226,7 @@ def clear():
     search_engine.doc_metadata = []
     search_engine.uploaded_files = {}
 
-    # Reset FAISS
+    # Reset FAISS when the convo is cleared
     dimension = embedding_model.dimension
     nlist = max(1, int(math.sqrt(len(search_engine.documents) or 1)))
     search_engine.indexer = FaissIndexer(dimension, nlist=nlist)
@@ -257,7 +253,7 @@ def delete_file():
     # Remove file entry
     del search_engine.uploaded_files[filename]
 
-    # Remove associated documents + metadata
+    # Remove associated documents and metadata
     remaining_docs = []
     remaining_meta = []
 
@@ -279,8 +275,8 @@ def delete_file():
 
     return redirect(url_for("home"))
 
-# -------------------------------
+
 # Run Server
-# -------------------------------
+
 if __name__ == "__main__":
     app.run(debug=True)

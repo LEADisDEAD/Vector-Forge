@@ -5,9 +5,8 @@ from utils import load_text_file,load_pdf_file, chunk_text
 import math
 import os
 
-# -------------------------
-# Load and index document
-# -------------------------
+# Load and index the documents
+
 
 documents = []
 
@@ -29,9 +28,9 @@ indexer = FaissIndexer(dimension, nlist=nlist)
 search_engine = SemanticSearch(embedding_model, indexer)
 search_engine.add_documents(documents)
 
-# -------------------------
-# Evaluation Queries
-# -------------------------
+
+# Example Evaluation Queries
+
 evaluation_queries = [
     {"query": "How does general relativity describe gravity?", "expected_phrase": "spacetime"},
     {"query": "What are black holes according to general relativity?", "expected_phrase": "black hole"},
