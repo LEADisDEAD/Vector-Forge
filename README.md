@@ -11,7 +11,8 @@ It is a modular AI retrieval engine that demonstrates real-world RAG architectur
 ## Application Preview
 
 ### 1. Landing Page
-<img width="1919" height="865" alt="Screenshot 2026-02-23 140152" src="https://github.com/user-attachments/assets/e1637aa2-5245-4126-af99-3bfaa5d43f27" />
+<img width="1918" height="867" alt="image" src="https://github.com/user-attachments/assets/2af4ed17-f972-4bc1-95bf-19858844d9e5" />
+
 
 The landing page introduces VectorForge as a production-style Retrieval-Augmented Generation system.
 It highlights:
